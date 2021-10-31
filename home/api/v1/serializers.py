@@ -90,13 +90,14 @@ class AppSerializer(serializers.ModelSerializer):
             return App.objects.create(**validated_data)
 
         def update(self, instance,validated_data):
-            instance.name = validated_data('name', instance.name)
-            instance.description = validated_data('description', instance.description)
-            instance.type = validated_data('type', instance.type)
-            instance.framework = validated_data('framework', instance.framework)
-            instance.domain_name = validated_data('domain_name', instance.domain_name)
+            instance.name = validated_data.get('name', instance.name)
+            instance.description = validated_data.get('description', instance.description)
+            instance.type = validated_data.get('type', instance.type)
+            instance.framework = validated_data.get('framework', instance.framework)
+            instance.domain_name = validated_data.get('domain_name', instance.domain_name)
             instance.save()
             return instance
+
 
 class PlanSerializer(serializers.ModelSerializer):
 
@@ -106,3 +107,19 @@ class PlanSerializer(serializers.ModelSerializer):
         fields = ['name', 'description', 'price'] + read_only_fields
 
 
+class SubscriptionSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Subscription
+        read_only_fields = ['id', 'user', 'created_at', 'updated_at']
+        fields = ['plan', 'app', 'active'] + read_only_fields
+
+    def create(self, validated_data):
+        return Subscription.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        instance.plan = validated_data.get('plan', instance.plan)
+        instance.app = validated_data.get('app', instance.app)
+        instance.active = validated_data.get('active', instance.active)
+        instance.save()
+        return instance
