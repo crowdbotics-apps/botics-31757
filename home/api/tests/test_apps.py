@@ -1,7 +1,6 @@
 from rest_framework import status
 
 from home.api.tests import BaseAPITestCase, AppFactory
-from home.models import App
 
 
 class AppsTestCase(BaseAPITestCase):
@@ -21,6 +20,10 @@ class AppsTestCase(BaseAPITestCase):
         )
         response = self.client.get(f'/api/v1/apps/{app.id}/', format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_list_app_by_non_existing_id(self):
+        response = self.client.get(f'/api/v1/apps/23/', format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_create_app(self):
         data = {
@@ -62,6 +65,7 @@ class AppsTestCase(BaseAPITestCase):
         }
         response = self.client.put(f'/api/v1/apps/{app.id}/', data=data, format='json')
         self.assertEqual(response.data['data']['name'], 'test application')
+        self.assertEqual(response.data['data']['domain_name'], 'test-application')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
     
     def test_update_app_with_existing_app_name(self):

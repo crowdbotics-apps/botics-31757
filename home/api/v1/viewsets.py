@@ -10,9 +10,10 @@ from home.api.v1.serializers import (
     SignupSerializer,
     UserSerializer,
     AppSerializer,
+    PlanSerializer,
 )
-from home.models import App
-from home.api.utils.app_utils import app_exists
+from home.models import App, Plan
+from home.api.utils.api_utils import app_exists
 
 
 class SignupViewSet(ModelViewSet):
@@ -158,3 +159,39 @@ class AppViewSet(ViewSet):
             },
             status=status.HTTP_200_OK
         )
+
+
+class PlanViewSet(ViewSet):
+    serializer_class = PlanSerializer
+    permission_classes = [IsAuthenticated,]
+
+    @swagger_auto_schema(responses = {200: PlanSerializer(many=True)})
+    def list(self, request):
+        queryset = Plan.objects.all()
+        serializer = self.serializer_class(queryset, many=True)
+        return Response({
+            "data": serializer.data,
+            "message": "success"
+            },
+            status=status.HTTP_200_OK
+        )
+    
+    @swagger_auto_schema(responses = {200: PlanSerializer()})
+    def retrieve(self, request, pk=None):
+        try:
+            plan = Plan.objects.get(pk=pk)
+        except Plan.DoesNotExist:
+            return Response({
+                "data": "Plan not found",
+                "message": "failed"
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        serializer = self.serializer_class(plan)
+        return Response({
+            "data": serializer.data,
+            "message": "success"
+            },
+            status=status.HTTP_200_OK
+        )
+

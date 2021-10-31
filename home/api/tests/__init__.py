@@ -3,7 +3,7 @@ from django.utils import timezone
 from django.contrib.auth import get_user_model
 from rest_framework.test import APITestCase, APIClient
 
-from home.models import App
+from home.models import App, Plan
 
 
 User = get_user_model()
@@ -12,6 +12,10 @@ User = get_user_model()
 class AppFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = App
+
+class PlanFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Plan
 
 
 class BaseAPITestCase(APITestCase):
@@ -32,6 +36,11 @@ class BaseAPITestCase(APITestCase):
             user=self.user_admin
         )
 
+        PlanFactory(
+            name="Pro",
+            description="pro-tier",
+            price=2.00
+        )
+
         self.client = APIClient()
         self.client.login(username='test_admin', password='password123')
-

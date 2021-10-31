@@ -91,10 +91,18 @@ class AppSerializer(serializers.ModelSerializer):
 
         def update(self, instance,validated_data):
             instance.name = validated_data('name', instance.name)
-            instance.description = validated_data('name', instance.description)
-            instance.type = validated_data('name', instance.type)
-            instance.framework = validated_data('name', instance.framework)
-            instance.domain_name = validated_data('name', instance.domain_name)
+            instance.description = validated_data('description', instance.description)
+            instance.type = validated_data('type', instance.type)
+            instance.framework = validated_data('framework', instance.framework)
+            instance.domain_name = validated_data('domain_name', instance.domain_name)
             instance.save()
             return instance
+
+class PlanSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Plan
+        read_only_fields = ['id', 'created_at', 'updated_at']
+        fields = ['name', 'description', 'price'] + read_only_fields
+
 

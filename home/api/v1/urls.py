@@ -5,12 +5,14 @@ from home.api.v1.viewsets import (
     SignupViewSet,
     LoginViewSet,
     AppViewSet,
+    PlanViewSet,
 )
 
 router = DefaultRouter()
 router.register("signup", SignupViewSet, basename="signup")
 router.register("login", LoginViewSet, basename="login")
 router.register("apps", AppViewSet, basename="apps")
+router.register("plans", PlanViewSet, basename="plans")
 
 urlpatterns = [
     path("", include(router.urls)),
