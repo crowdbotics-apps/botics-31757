@@ -1,4 +1,4 @@
-from home.models import App
+from home.models import App, Plan
 
 
 def app_exists(data, user):
