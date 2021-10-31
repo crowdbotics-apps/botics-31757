@@ -11,10 +11,10 @@ from home.api.v1.serializers import (
     UserSerializer,
     AppSerializer,
     PlanSerializer,
+    SubscriptionSerializer
 )
-from home.models import App, Plan
-from home.api.utils.api_utils import app_exists
-
+from home.models import App, Plan, Subscription
+from home.api.utils.api_utils import app_exists, sub_exists
 
 class SignupViewSet(ModelViewSet):
     serializer_class = SignupSerializer
@@ -142,7 +142,7 @@ class AppViewSet(ViewSet):
             status=status.HTTP_200_OK
         )
 
-    @swagger_auto_schema(request_body=AppSerializer)
+    @swagger_auto_schema()
     def destroy(self, request, pk=None):
         try:
             app = App.objects.get(user=request.user.id, pk=pk)
@@ -195,3 +195,115 @@ class PlanViewSet(ViewSet):
             status=status.HTTP_200_OK
         )
 
+
+class SubscriptionViewSet(ViewSet):
+    serializer_class = SubscriptionSerializer
+    permission_classes = [IsAuthenticated,]
+
+    @swagger_auto_schema(responses = {200: SubscriptionSerializer(many=True)})
+    def list(self, request):
+        queryset = Subscription.objects.filter(active=True)
+        serializer = self.serializer_class(queryset, many=True)
+        return Response({
+            "data": serializer.data,
+            "message": "success"
+            },
+            status=status.HTTP_200_OK
+        )
+    
+    @swagger_auto_schema(request_body=SubscriptionSerializer)
+    def create(self, request):
+        data = request.data
+        exists = sub_exists(data=data, user=request.user)
+        if exists:
+            return Response({
+                "detail": "Subscription for app on the plan exists",
+                "message": "failed"
+                }, status=status.HTTP_400_BAD_REQUEST
+            )
+        serializer = self.serializer_class(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(user=request.user)
+        return Response({
+            "data": serializer.data,
+            "message": "success"
+            },
+            status=status.HTTP_201_CREATED
+        )
+    
+    @swagger_auto_schema(responses = {200: SubscriptionSerializer()})
+    def retrieve(self, request, pk=None):
+        try:
+            sub = Subscription.objects.get(user=request.user.id, pk=pk)
+        except Subscription.DoesNotExist:
+            return Response({
+                "data": "Subscription not found",
+                "message": "failed"
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        serializer = self.serializer_class(sub)
+        return Response({
+            "data": serializer.data,
+            "message": "success"
+            },
+            status=status.HTTP_200_OK
+        )
+    
+    @swagger_auto_schema(request_body=SubscriptionSerializer)
+    def update(self, request, pk=None):
+        try:
+            sub = Subscription.objects.get(user=request.user.id, pk=pk)
+        except Subscription.DoesNotExist:
+            return Response({
+                "data": "Subscription not found",
+                "message": "failed"
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        data = request.data
+        exists = sub_exists(data=data, user=request.user)
+        if exists:
+            return Response({
+                "detail": "Subscription for app on the plan exists",
+                "message": "failed"
+                }, status=status.HTTP_400_BAD_REQUEST
+            )
+        serializer = self.serializer_class(sub, data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({
+            "data": serializer.data,
+            "message": "success"
+            },
+            status=status.HTTP_200_OK
+        )
+
+    @swagger_auto_schema(request_body=SubscriptionSerializer)
+    def partial_update(self, request, pk=None):
+        try:
+            sub = Subscription.objects.get(user=request.user.id, pk=pk)
+        except Subscription.DoesNotExist:
+            return Response({
+                "data": "Subscription not found",
+                "message": "failed"
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        data = request.data
+        exists = sub_exists(data=data, user=request.user)
+        if exists:
+            return Response({
+                "detail": "Subscription for app on the plan exists",
+                "message": "failed"
+                }, status=status.HTTP_400_BAD_REQUEST
+            )
+        serializer = self.serializer_class(sub, data=data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({
+            "data": serializer.data,
+            "message": "success"
+            },
+            status=status.HTTP_200_OK
+        ) 

@@ -1,15 +1,18 @@
 from django.contrib import admin
 
 # Register your models here.
-from home.models import App, Plan
+from home.models import App, Plan, Subscription
 
-class AppAddmin(admin.ModelAdmin):
+class AppAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'type', 'framework', 'description', 'user', 'created_at')
 
-class PlanAddmin(admin.ModelAdmin):
+class PlanAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'description', 'price', 'created_at')
 
+class SubscriptionAdmin(admin.ModelAdmin):
+    list_display = ('id', 'plan', 'app', 'user', 'active', 'created_at')
 
-admin.site.register(App, AppAddmin)
-admin.site.register(Plan, PlanAddmin)
 
+admin.site.register(App, AppAdmin)
+admin.site.register(Plan, PlanAdmin)
+admin.site.register(Subscription, SubscriptionAdmin)
