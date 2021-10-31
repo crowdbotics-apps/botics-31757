@@ -9,6 +9,8 @@ from allauth.account.utils import setup_user_email
 from rest_framework import serializers
 from rest_auth.serializers import PasswordResetSerializer
 
+from home.models import App, Plan, Subscription
+
 
 User = get_user_model()
 
@@ -74,3 +76,25 @@ class UserSerializer(serializers.ModelSerializer):
 class PasswordSerializer(PasswordResetSerializer):
     """Custom serializer for rest_auth to solve reset password error"""
     password_reset_form_class = ResetPasswordForm
+
+
+
+class AppSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = App
+        read_only_fields = ['id', 'user', 'created_at', 'updated_at']
+        fields = ['name', 'description', 'type', 'framework', 'domain_name'] + read_only_fields
+
+        def create(self, validated_data):
+            return App.objects.create(**validated_data)
+
+        def update(self, instance,validated_data):
+            instance.name = validated_data('name', instance.name)
+            instance.description = validated_data('name', instance.description)
+            instance.type = validated_data('name', instance.type)
+            instance.framework = validated_data('name', instance.framework)
+            instance.domain_name = validated_data('name', instance.domain_name)
+            instance.save()
+            return instance
+
