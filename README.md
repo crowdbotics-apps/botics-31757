@@ -82,6 +82,10 @@ This project is set up to run using [Docker Compose](https://docs.docker.com/com
    ```
    You will find an activation link in the server log output.
 
+1. Run tests:
+   ```sh
+   $ docker-compose exec web python3 manage.py test
+   ```
 ## Local Setup (Alternative to Docker)
 
 1. [Postgresql](https://www.postgresql.org/download/)

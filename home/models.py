@@ -8,20 +8,6 @@ from django.db import models
 User = get_user_model()
 
 
-class AppType(Enum):
-    WEB = 'Web'
-    MOBILE = 'Mobile'
-
-
-class AppFramework(Enum):
-    DJANGO = 'Django'
-    REACT_NATIVE = 'React Native'
-
-
-# class BaseModel(models.Model):
-    
-
-
 class Plan(models.Model):
     name = models.CharField(max_length=20)
     description = models.CharField(max_length=255)
@@ -32,7 +18,7 @@ class Plan(models.Model):
 
 class Subscription(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    app = models.ForeignKey('home.App', on_delete=models.CASCADE, related_name='subscription_app')
+    app = models.OneToOneField('home.App', on_delete=models.CASCADE, related_name='subscription_app', unique=True)
     plan = models.ForeignKey('home.Plan', on_delete=models.CASCADE)
     active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -40,13 +26,30 @@ class Subscription(models.Model):
 
 
 class App(models.Model):
+    WEB = 'Web'
+    MOBILE = 'Mobile'
+    AppType = (
+        (WEB, 'Web'),
+        (MOBILE, 'Mobile')
+    )
+
+    DJANGO = 'Django'
+    REACT_NATIVE = 'React Native'
+    AppFramework = (
+        (DJANGO, 'Django'),
+        (REACT_NATIVE, 'React Native')
+    )
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
     description = models.CharField(null=True, blank=True, max_length=255)
-    type = models.CharField(max_length=10, choices=[(tag, tag.value) for tag in AppType])
-    framework = models.CharField(max_length=10, choices=[(tag, tag.value) for tag in AppFramework])
+    type = models.CharField(max_length=10, choices=AppType)
+    framework = models.CharField(max_length=10, choices=AppFramework)
     domain_name = models.CharField(max_length=50, blank=True, null=True)
     screenshot = models.URLField(blank=True, null=True)
     subscription = models.ForeignKey('home.Subscription', blank=True, null=True, on_delete=models.SET_NULL, related_name='app_subscription')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('name', 'user')
