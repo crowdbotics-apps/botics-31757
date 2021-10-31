@@ -104,7 +104,7 @@ class AppViewSet(ViewSet):
             )
         
         data = request.data
-        exists = app_exists(data=data, user=request.user)
+        exists = app_exists(data=data, user=request.user, id=pk)
         if exists:
             return Response({
                 "detail": f"App with name {data['name']} exists",

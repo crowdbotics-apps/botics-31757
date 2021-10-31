@@ -18,7 +18,7 @@ class Plan(models.Model):
 
 class Subscription(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    app = models.OneToOneField('home.App', on_delete=models.CASCADE, related_name='subscription_app', unique=True)
+    app = models.ForeignKey('home.App', on_delete=models.CASCADE, related_name='subscription_app')
     plan = models.ForeignKey('home.Plan', on_delete=models.CASCADE)
     active = models.BooleanField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -43,8 +43,8 @@ class App(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
     description = models.CharField(null=True, blank=True, max_length=255)
-    type = models.CharField(max_length=10, choices=AppType)
-    framework = models.CharField(max_length=10, choices=AppFramework)
+    type = models.CharField(max_length=50, choices=AppType)
+    framework = models.CharField(max_length=50, choices=AppFramework)
     domain_name = models.CharField(max_length=50, blank=True, null=True)
     screenshot = models.URLField(blank=True, null=True)
     subscription = models.ForeignKey('home.Subscription', blank=True, null=True, on_delete=models.SET_NULL, related_name='app_subscription')
