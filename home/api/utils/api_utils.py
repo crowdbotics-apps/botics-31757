@@ -13,11 +13,9 @@ def sub_exists(data, user):
     """
     Check user has active subscription for app exists
     """
-    plan = data.get('plan', None)
     app = data.get('app', None)
     active = data.get('active', None)
     sub_exists = Subscription.objects.filter(
-        plan=plan,
         app=app,
         active=active,
         user=user
